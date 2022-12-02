@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "core.h"
 
 #include <opencv2/opencv.hpp>
 #include <QMessageBox>
@@ -18,19 +19,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->startStopBtn, &QPushButton::clicked, this, &MainWindow::startStop);
     connect(ui->exitBtn, &QPushButton::clicked, this, &MainWindow::exit);
 
-    // Initialize timer
-    if (capture.open(0))
-    {
-        timer = new QTimer(this);
-        connect(timer, &QTimer::timeout, this, &MainWindow::update);
-        ui->startStopBtn->setText(u"Stop"_s);
-        timer->start(25);
-    }
-    else
+    // Open camera
+    if (!capture.open(0))
     {
         QMessageBox::critical(this, u"Error"_s, u"Failed to open the camera."_s);
         exit();
     }
+    move(0, 0);
+
+    // Initialize timer
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &MainWindow::update);
+    ui->startStopBtn->setText(u"Stop"_s);
+    timer->start(25);
 }
 
 MainWindow::~MainWindow()
@@ -47,18 +48,29 @@ void MainWindow::exit()
 {
     timer->stop();
     timer->~QTimer();
+    capture.release();
     QApplication::exit();
 }
 
 void MainWindow::update()
 {
+    // capture the current frame
     capture >> mat;
-    const QImage image =
+
+    const QImage imageBefore =
         QImage(mat.data, mat.cols, mat.rows, QImage::Format_RGB888)
             .rgbSwapped();
-    const QPixmap pixmap = QPixmap::fromImage(image);
-    ui->beforeLabel->setPixmap(pixmap);
-    ui->afterLabel->setPixmap(pixmap);
+
+    // Do fragmentation
+    Core::segmentation(mat);
+
+    const QImage imageAfter =
+        QImage(mat.data, mat.cols, mat.rows, QImage::Format_RGB888)
+            .rgbSwapped();
+
+    // Show the fragmentated picture
+    ui->beforeLabel->setPixmap(QPixmap::fromImage(imageBefore));
+    ui->afterLabel->setPixmap(QPixmap::fromImage(imageAfter));
 }
 
 void MainWindow::startStop()

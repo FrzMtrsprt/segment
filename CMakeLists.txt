@@ -14,6 +14,8 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 set(PROJECT_SOURCES
+        core.cpp
+        core.h
         main.cpp
         mainwindow.cpp
         mainwindow.h
