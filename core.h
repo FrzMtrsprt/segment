@@ -3,11 +3,9 @@
 
 #include <opencv2/opencv.hpp>
 
-using namespace cv;
-
 class Core
 {
 public:
-    static void segmentation(Mat &mat);
+    static void segmentation(cv::Mat &mat);
 };
 #endif // CORE_H

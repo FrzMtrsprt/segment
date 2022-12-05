@@ -16,10 +16,81 @@
         </property>
         <layout class="QGridLayout" name="beforeLayout">
          <item row="0" column="0">
-          <widget class="QLabel" name="beforeLabel"/>
+          <widget class="QLabel" name="beforeLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="btnBox">
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="fileBox">
+          <property name="title">
+           <string>File</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QPushButton" name="openFileBtn">
+             <property name="text">
+              <string>Browse</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="cameraBox">
+          <property name="title">
+           <string>Camera</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QPushButton" name="startStopBtn">
+             <property name="text">
+              <string>Start / Stop</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="captureBtn">
+          <property name="text">
+           <string>Go!</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="exitBtn">
+          <property name="text">
+           <string>Exit</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QGroupBox" name="afterBox">
@@ -28,34 +99,16 @@
         </property>
         <layout class="QGridLayout" name="afterLayout">
          <item row="0" column="0">
-          <widget class="QLabel" name="afterLabel"/>
+          <widget class="QLabel" name="afterLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
         </layout>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="buttonBox">
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="startStopBtn">
-        <property name="text">
-         <string>Start / Stop</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="exitBtn">
-        <property name="text">
-         <string>Exit</string>
-        </property>
        </widget>
       </item>
      </layout>

@@ -2,9 +2,22 @@
 
 #include <opencv2/opencv.hpp>
 
-using namespace cv;
+int s = 100;
 
-void Core::segmentation(Mat &mat)
+void Core::segmentation(cv::Mat &mat)
 {
-    // Do segmentation
+    // Initialize seed points
+    std::vector<std::vector<int>> seeds;
+    for (int i = s / 2; i < mat.rows; i += s)
+    {
+        for (int j = s / 2; j < mat.cols; j += s)
+        {
+            seeds.push_back({i, j});
+        }
+    }
+    for (std::vector<int> seed : seeds)
+    {
+
+        mat.at<int>(seed[0], seed[1]) = 0;
+    }
 }
