@@ -8,7 +8,7 @@
 
 #include "core.h"
 
-using namespace Qt;
+using namespace Qt::Literals::StringLiterals;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
         QMessageBox::critical(this, u"Error"_s, u"Failed to open the camera."_s);
         close();
     }
-    move(0, 0);
+    setWindowState(Qt::WindowMaximized);
 
     // Initialize timer
     timer = new QTimer(this);
@@ -52,10 +52,7 @@ void MainWindow::update()
     // Capture the current frame
     capture >> frame;
 
-    const QImage image =
-        QImage(frame.data, frame.cols, frame.rows, QImage::Format_RGB888)
-            .rgbSwapped();
-    ui->beforeLabel->setPixmap(QPixmap::fromImage(image));
+    setPixmapToLabel(ui->beforeLabel, frame);
 }
 
 void MainWindow::openFile()
@@ -72,10 +69,7 @@ void MainWindow::openFile()
     // Decode to local 8-bit to support Chinese file names
     frame = cv::imread(fileName.toLocal8Bit().toStdString());
 
-    const QImage image =
-        QImage(frame.data, frame.cols, frame.rows, QImage::Format_RGB888)
-            .rgbSwapped();
-    ui->beforeLabel->setPixmap(QPixmap::fromImage(image));
+    setPixmapToLabel(ui->beforeLabel, frame);
 }
 
 void MainWindow::startStop()
@@ -99,8 +93,14 @@ void MainWindow::captureFrame()
     frame.copyTo(mat);
     Core::segmentation(mat);
 
-    const QImage image =
-        QImage(mat.data, mat.cols, mat.rows, QImage::Format_RGB888)
-            .rgbSwapped();
-    ui->afterLabel->setPixmap(QPixmap::fromImage(image));
+    setPixmapToLabel(ui->afterLabel, mat);
+}
+
+void MainWindow::setPixmapToLabel(QLabel *label, const cv::Mat &mat)
+{
+    label->setPixmap(
+        QPixmap::fromImage(
+            QImage(mat.data, mat.cols, mat.rows, QImage::Format_RGB888)
+                .scaled(label->size(), Qt::KeepAspectRatio)
+                .rgbSwapped()));
 }

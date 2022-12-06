@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <opencv2/opencv.hpp>
+#include <QLabel>
 #include <QMainWindow>
 #include <QTimer>
 
@@ -27,5 +28,6 @@ private:
     void openFile();
     void startStop();
     void captureFrame();
+    void setPixmapToLabel(QLabel *label, const cv::Mat &mat);
 };
 #endif // MAINWINDOW_H
