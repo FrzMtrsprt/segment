@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::update);
     ui->startStopBtn->setText(u"Stop"_s);
-    timer->start(capture.get(cv::CAP_PROP_FPS));
+    timer->start(25);
 }
 
 MainWindow::~MainWindow()
@@ -95,8 +95,8 @@ void MainWindow::startStop()
 void MainWindow::captureFrame()
 {
     // Get the current frame
-    cv::Mat mat = frame;
-
+    cv::Mat mat;
+    frame.copyTo(mat);
     Core::segmentation(mat);
 
     const QImage image =

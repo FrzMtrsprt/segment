@@ -7,5 +7,8 @@ class Core
 {
 public:
     static void segmentation(cv::Mat &mat);
+
+private:
+    static double distance(const cv::Mat &mat, const std::vector<int> &sxy, const std::vector<int> &pxy);
 };
 #endif // CORE_H
