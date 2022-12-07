@@ -34,7 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::update);
     ui->startStopBtn->setText(u"Stop"_s);
-    timer->start(25);
+    timer->setInterval(25);
+    timer->start();
 }
 
 MainWindow::~MainWindow()
@@ -44,7 +45,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::about()
 {
-    QMessageBox::information(this, u"About"_s, u"Image Processing Project\n\nBy Huaiyu Chen"_s);
+    QMessageBox::information(this, u"About"_s, u"Image Segmentation\n\nBy Huaiyu Chen"_s);
 }
 
 void MainWindow::update()
@@ -52,7 +53,7 @@ void MainWindow::update()
     // Capture the current frame
     capture >> frame;
 
-    setPixmapToLabel(ui->beforeLabel, frame);
+    setMatToLabel(ui->beforeLabel, frame);
 }
 
 void MainWindow::openFile()
@@ -69,7 +70,7 @@ void MainWindow::openFile()
     // Decode to local 8-bit to support Chinese file names
     frame = cv::imread(fileName.toLocal8Bit().toStdString());
 
-    setPixmapToLabel(ui->beforeLabel, frame);
+    setMatToLabel(ui->beforeLabel, frame);
 }
 
 void MainWindow::startStop()
@@ -81,7 +82,7 @@ void MainWindow::startStop()
     }
     else
     {
-        timer->start(capture.get(cv::CAP_PROP_FPS));
+        timer->start();
         ui->startStopBtn->setText(u"Stop"_s);
     }
 }
@@ -89,14 +90,14 @@ void MainWindow::startStop()
 void MainWindow::captureFrame()
 {
     // Get the current frame
-    cv::Mat mat;
-    frame.copyTo(mat);
+    cv::Mat mat(frame);
+
     Core::segmentation(mat);
 
-    setPixmapToLabel(ui->afterLabel, mat);
+    setMatToLabel(ui->afterLabel, mat);
 }
 
-void MainWindow::setPixmapToLabel(QLabel *label, const cv::Mat &mat)
+void MainWindow::setMatToLabel(QLabel *label, const cv::Mat &mat)
 {
     label->setPixmap(
         QPixmap::fromImage(

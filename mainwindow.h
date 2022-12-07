@@ -28,6 +28,6 @@ private:
     void openFile();
     void startStop();
     void captureFrame();
-    void setPixmapToLabel(QLabel *label, const cv::Mat &mat);
+    void setMatToLabel(QLabel *label, const cv::Mat &mat);
 };
 #endif // MAINWINDOW_H
