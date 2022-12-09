@@ -6,6 +6,8 @@
 #include <QMainWindow>
 #include <QTimer>
 
+#include "core.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -20,6 +22,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    Core core;
     QTimer *timer;
     cv::Mat frame;
     cv::VideoCapture capture;

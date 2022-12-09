@@ -57,7 +57,7 @@ void MainWindow::about()
 void MainWindow::update()
 {
     // Capture the current frame
-    capture >> frame;
+    capture.read(frame);
 
     setMatToLabel(ui->beforeLabel, frame);
 }
@@ -95,13 +95,13 @@ void MainWindow::startStop()
 
 void MainWindow::captureFrame()
 {
-    // Get the current frame
-    cv::Mat mat;
-    frame.copyTo(mat);
+    // Get the current frame & parameters
+    frame.copyTo(core.mat);
+    core.s = ui->sBox->value();
+    core.m = ui->mBox->value();
+    core.segmentation();
 
-    Core::segmentation(mat, ui->sBox->value(), ui->mBox->value());
-
-    setMatToLabel(ui->afterLabel, mat);
+    setMatToLabel(ui->afterLabel, core.mat);
 }
 
 void MainWindow::setMatToLabel(QLabel *label, const cv::Mat &mat)

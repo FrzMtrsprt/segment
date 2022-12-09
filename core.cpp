@@ -2,19 +2,10 @@
 
 #include <opencv2/opencv.hpp>
 
-cv::Mat *Core::mat = nullptr;
+Core::Core() {}
 
-// Sampling step
-int Core::s = 50;
-// Distance constant
-int Core::m = 10;
-
-void Core::segmentation(cv::Mat &mat, const int &s, const int &m)
+void Core::segmentation()
 {
-    Core::mat = &mat;
-    Core::s = s;
-    Core::m = m;
-
     // Initialize seed points
     std::vector<std::vector<int>> seeds;
     for (int i = s / 2; i < mat.rows; i += s)
@@ -117,7 +108,7 @@ void Core::segmentation(cv::Mat &mat, const int &s, const int &m)
     }
 
     // Paint the seeds
-    for (const std::vector<int> seed : seeds)
+    for (const std::vector<int> &seed : seeds)
     {
         mat.at<cv::Vec3b>(seed[0], seed[1]) = {0, 0, 0};
     }
@@ -126,8 +117,8 @@ void Core::segmentation(cv::Mat &mat, const int &s, const int &m)
 int Core::distance(const std::vector<int> &sxy, const std::vector<int> &pxy)
 {
     // Color of seed and point
-    const cv::Vec3b sc = mat->at<cv::Vec3b>(sxy[0], sxy[1]);
-    const cv::Vec3b pc = mat->at<cv::Vec3b>(pxy[0], pxy[1]);
+    const cv::Vec3b sc = mat.at<cv::Vec3b>(sxy[0], sxy[1]);
+    const cv::Vec3b pc = mat.at<cv::Vec3b>(pxy[0], pxy[1]);
     // Distance of color
     const double dc = (pow(sc[0] - pc[0], 2) + pow(sc[1] - pc[1], 2) + pow(sc[2] - pc[2], 2)) / 3;
     // Distance of space
@@ -140,11 +131,11 @@ int Core::distance(const std::vector<int> &sxy, const std::vector<int> &pxy)
 int Core::gradient(const std::vector<int> &pxy)
 {
     // P and the four pixels around it
-    const cv::Vec3b p = mat->at<cv::Vec3b>(pxy[0], pxy[1]);
-    const cv::Vec3b xlo = mat->at<cv::Vec3b>(pxy[0] - 1, pxy[1]);
-    const cv::Vec3b xhi = mat->at<cv::Vec3b>(pxy[0] + 1, pxy[1]);
-    const cv::Vec3b ylo = mat->at<cv::Vec3b>(pxy[0], pxy[1] - 1);
-    const cv::Vec3b yhi = mat->at<cv::Vec3b>(pxy[0], pxy[1] + 1);
+    const cv::Vec3b p = mat.at<cv::Vec3b>(pxy[0], pxy[1]);
+    const cv::Vec3b xlo = mat.at<cv::Vec3b>(pxy[0] - 1, pxy[1]);
+    const cv::Vec3b xhi = mat.at<cv::Vec3b>(pxy[0] + 1, pxy[1]);
+    const cv::Vec3b ylo = mat.at<cv::Vec3b>(pxy[0], pxy[1] - 1);
+    const cv::Vec3b yhi = mat.at<cv::Vec3b>(pxy[0], pxy[1] + 1);
     const int dxhi = abs(xhi[0] - p[0]) + abs(xhi[1] - p[1]) + abs(xhi[2] - p[2]);
     const int dxlo = abs(xlo[0] - p[0]) + abs(xlo[1] - p[1]) + abs(xlo[2] - p[2]);
     const int dyhi = abs(yhi[0] - p[0]) + abs(yhi[1] - p[1]) + abs(yhi[2] - p[2]);
