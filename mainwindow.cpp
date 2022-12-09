@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(ui->openFileBtn, &QPushButton::clicked, this, &MainWindow::openFile);
     connect(ui->startStopBtn, &QPushButton::clicked, this, &MainWindow::startStop);
+    connect(ui->sBox, &QSpinBox::valueChanged, this, &MainWindow::captureFrame);
+    connect(ui->mBox, &QSpinBox::valueChanged, this, &MainWindow::captureFrame);
     connect(ui->captureBtn, &QPushButton::clicked, this, &MainWindow::captureFrame);
     connect(ui->exitBtn, &QPushButton::clicked, this, &MainWindow::close);
 
@@ -28,7 +30,11 @@ MainWindow::MainWindow(QWidget *parent)
         QMessageBox::critical(this, u"Error"_s, u"Failed to open the camera."_s);
         close();
     }
+
     setWindowState(Qt::WindowMaximized);
+
+    ui->sBox->setValue(50);
+    ui->mBox->setValue(10);
 
     // Initialize timer
     timer = new QTimer(this);
@@ -90,9 +96,10 @@ void MainWindow::startStop()
 void MainWindow::captureFrame()
 {
     // Get the current frame
-    cv::Mat mat(frame);
+    cv::Mat mat;
+    frame.copyTo(mat);
 
-    Core::segmentation(mat);
+    Core::segmentation(mat, ui->sBox->value(), ui->mBox->value());
 
     setMatToLabel(ui->afterLabel, mat);
 }

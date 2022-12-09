@@ -73,6 +73,23 @@
          </widget>
         </item>
         <item>
+         <widget class="QSpinBox" name="sBox">
+          <property name="prefix">
+           <string>s = </string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="mBox">
+          <property name="prefix">
+           <string>m = </string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="captureBtn">
           <property name="text">
            <string>Go!</string>
