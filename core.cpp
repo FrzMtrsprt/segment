@@ -25,35 +25,8 @@ void Core::segmentation(cv::Mat &mat, const int &s, const int &m)
         }
     }
 
-    // For each seed, from 3x3 pixels around it,
-    // choose the pixel with the least grad as new seed
-    for (int i = 0; i < seeds.size(); i++)
-    {
-        const std::vector<int> seed = seeds[i];
-        std::vector<int> seedMin = {-1, -1};
-        int gradMin = INT_MAX;
-
-        const int xstart = std::max(seed[0] - 1, 1);
-        const int xend = std::min(seed[0] + 1, mat.rows - 1);
-        for (int x = xstart; x <= xend; x++)
-        {
-            const int ystart = std::max(seed[1] - 1, 1);
-            const int yend = std::min(seed[1] + 1, mat.cols - 1);
-            for (int y = ystart; y <= yend; y++)
-            {
-                const int grad = gradient({x, y});
-                if (grad < gradMin)
-                {
-                    seedMin = {x, y};
-                    gradMin = grad;
-                }
-            }
-        }
-        seeds[i] = seedMin;
-    }
-
     // Each Pixel's seed number and distance
-    std::vector<std::vector<std::vector<int>>> cluster;
+    std::vector<std::vector<std::vector<int>>> pixelInfo;
     // Fill the 3d vector
     for (int x = 0; x <= mat.rows; x++)
     {
@@ -63,7 +36,45 @@ void Core::segmentation(cv::Mat &mat, const int &s, const int &m)
             // An invalid seed number and maximum distance
             row.push_back({-1, INT_MAX});
         }
-        cluster.push_back(row);
+        pixelInfo.push_back(row);
+    }
+
+    // Iterate until seeds become stable
+    bool changed = true;
+    while (changed)
+    {
+        changed = false;
+        // For each seed, from 3x3 pixels around it,
+        // choose the pixel with the least grad as new seed
+        for (int i = 0; i < seeds.size(); i++)
+        {
+            const std::vector<int> seed = seeds[i];
+            std::vector<int> seedMin = {-1, -1};
+            int gradMin = INT_MAX;
+
+            const int xstart = std::max(seed[0] - 1, 1);
+            const int xend = std::min(seed[0] + 1, mat.rows - 1);
+            for (int x = xstart; x <= xend; x++)
+            {
+                const int ystart = std::max(seed[1] - 1, 1);
+                const int yend = std::min(seed[1] + 1, mat.cols - 1);
+                for (int y = ystart; y <= yend; y++)
+                {
+                    const int grad = gradient({x, y});
+                    if (grad < gradMin)
+                    {
+                        seedMin = {x, y};
+                        gradMin = grad;
+                    }
+                }
+            }
+            // If seed moved
+            if (seedMin[0] != seeds[i][0] || seedMin[1] != seeds[i][1])
+            {
+                seeds[i] = seedMin;
+                changed = true;
+            }
+        }
     }
 
     // For each seed, cluster the pixels around it
@@ -79,9 +90,9 @@ void Core::segmentation(cv::Mat &mat, const int &s, const int &m)
             for (int y = ystart; y < yend; y++)
             {
                 const int d = distance(seed, {x, y});
-                if (d < cluster[x][y][1])
+                if (d < pixelInfo[x][y][1])
                 {
-                    cluster[x][y] = {i, d};
+                    pixelInfo[x][y] = {i, d};
                 }
             }
         }
@@ -92,11 +103,15 @@ void Core::segmentation(cv::Mat &mat, const int &s, const int &m)
     {
         for (int y = 0; y < mat.cols; y++)
         {
-            const int i = cluster[x][y][0];
+            const int i = pixelInfo[x][y][0];
             // If seed number is valid
             if (i >= 0)
             {
                 mat.at<cv::Vec3b>(x, y) = mat.at<cv::Vec3b>(seeds[i][0], seeds[i][1]);
+            }
+            else
+            {
+                mat.at<cv::Vec3b>(x, y) = {0, 255, 0}; // Green
             }
         }
     }
@@ -124,12 +139,15 @@ int Core::distance(const std::vector<int> &sxy, const std::vector<int> &pxy)
 
 int Core::gradient(const std::vector<int> &pxy)
 {
-    // The four pixels around p
+    // P and the four pixels around it
+    const cv::Vec3b p = mat->at<cv::Vec3b>(pxy[0], pxy[1]);
     const cv::Vec3b xlo = mat->at<cv::Vec3b>(pxy[0] - 1, pxy[1]);
     const cv::Vec3b xhi = mat->at<cv::Vec3b>(pxy[0] + 1, pxy[1]);
     const cv::Vec3b ylo = mat->at<cv::Vec3b>(pxy[0], pxy[1] - 1);
     const cv::Vec3b yhi = mat->at<cv::Vec3b>(pxy[0], pxy[1] + 1);
-    const int dx = (xhi[0] - xlo[0] + xhi[1] - xlo[1] + xhi[2] - xlo[2]) / 3;
-    const int dy = (yhi[0] - ylo[0] + yhi[1] - ylo[1] + yhi[2] - ylo[2]) / 3;
-    return dx + dy;
+    const int dxhi = abs(xhi[0] - p[0]) + abs(xhi[1] - p[1]) + abs(xhi[2] - p[2]);
+    const int dxlo = abs(xlo[0] - p[0]) + abs(xlo[1] - p[1]) + abs(xlo[2] - p[2]);
+    const int dyhi = abs(yhi[0] - p[0]) + abs(yhi[1] - p[1]) + abs(yhi[2] - p[2]);
+    const int dylo = abs(ylo[0] - p[0]) + abs(ylo[1] - p[1]) + abs(ylo[2] - p[2]);
+    return dxhi + dxlo + dyhi + dylo;
 }
