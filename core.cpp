@@ -30,11 +30,9 @@ void Core::segmentation()
         pixelInfo.push_back(row);
     }
 
-    // Iterate until seeds become stable
-    bool changed = true;
-    while (changed)
+    // Iterate but keep seeds from getting too close
+    for (int iter = 0; iter < s / 2; iter++)
     {
-        changed = false;
         // For each seed, from 3x3 pixels around it,
         // choose the pixel with the least grad as new seed
         for (int i = 0; i < seeds.size(); i++)
@@ -63,7 +61,6 @@ void Core::segmentation()
             if (seedMin[0] != seeds[i][0] || seedMin[1] != seeds[i][1])
             {
                 seeds[i] = seedMin;
-                changed = true;
             }
         }
     }
