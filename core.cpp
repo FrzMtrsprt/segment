@@ -45,11 +45,11 @@ void Core::segmentation()
 
             const int xstart = std::max(seed[0] - 1, 1);
             const int xend = std::min(seed[0] + 1, mat.rows - 1);
-            for (int x = xstart; x <= xend; x++)
+            for (int x = xstart; x < xend; x++)
             {
                 const int ystart = std::max(seed[1] - 1, 1);
                 const int yend = std::min(seed[1] + 1, mat.cols - 1);
-                for (int y = ystart; y <= yend; y++)
+                for (int y = ystart; y < yend; y++)
                 {
                     const int grad = gradient({x, y});
                     if (grad < gradMin)
