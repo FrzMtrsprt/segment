@@ -31,8 +31,10 @@ void Core::segmentation()
     }
 
     // Iterate but keep seeds from getting too close
-    for (int iter = 0; iter < s / 2; iter++)
+    bool changed = true;
+    for (int iter = 0; iter < s / 2 && changed == true; iter++)
     {
+        changed = false;
         // For each seed, from 3x3 pixels around it,
         // choose the pixel with the least grad as new seed
         for (int i = 0; i < seeds.size(); i++)
@@ -61,6 +63,7 @@ void Core::segmentation()
             if (seedMin[0] != seeds[i][0] || seedMin[1] != seeds[i][1])
             {
                 seeds[i] = seedMin;
+                changed = true;
             }
         }
     }
@@ -80,6 +83,7 @@ void Core::segmentation()
                 const int d = distance(seed, {x, y});
                 if (d < pixelInfo[x][y][1])
                 {
+                    // Assign the pixel to new seed
                     pixelInfo[x][y] = {i, d};
                 }
             }
@@ -117,9 +121,9 @@ int Core::distance(const std::vector<int> &sxy, const std::vector<int> &pxy)
     const cv::Vec3b sc = mat.at<cv::Vec3b>(sxy[0], sxy[1]);
     const cv::Vec3b pc = mat.at<cv::Vec3b>(pxy[0], pxy[1]);
     // Distance of color
-    const double dc = (pow(sc[0] - pc[0], 2) + pow(sc[1] - pc[1], 2) + pow(sc[2] - pc[2], 2)) / 3;
+    const double dc = (abs(sc[0] - pc[0]) + abs(sc[1] - pc[1]) + abs(sc[2] - pc[2])) / 3;
     // Distance of space
-    const double ds = (pow(sxy[0] - pxy[0], 2) + pow(sxy[1] - pxy[1], 2)) / 2;
+    const double ds = (abs(sxy[0] - pxy[0]) + abs(sxy[1] - pxy[1])) / 2;
     // Weighed distance
     const int d = (int)(dc * s + ds * m);
     return d;

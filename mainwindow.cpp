@@ -99,6 +99,7 @@ void MainWindow::captureFrame()
     frame.copyTo(core.mat);
     core.s = ui->sBox->value();
     core.m = ui->mBox->value();
+
     core.segmentation();
 
     setMatToLabel(ui->afterLabel, core.mat);
